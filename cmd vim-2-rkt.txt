@@ -1,0 +1,8 @@
+:!start DrRacket %
+:nnoremap <F5> :!start DrRacket %<CR>
+
+PS: in DrRacket IDE
+-> Edit
+-> Preferences
+-> General
+-> Check the 'Open files in separate tabs (not separate windows)'
