@@ -15,11 +15,11 @@ Loop, %LISP_PATH%\*.*
 }
 VI_PATH  := "gvim -c ""simalt ~x"" -c ""cd " . LISP_PATH . """ -c ""e .\" . NewestFileName . """ -c ""vsp"""
 VI_TITLE := "ahk_exe gvim.exe"
-Run             , %VI_PATH%     , 
-WinWaitActive   , %VI_TITLE%    ,
-Sleep           , 500
 Run             , %LISP_PATH%     , 
 WinWaitActive   , %LISP_TITLE%    ,
+Sleep           , 500
+Run             , %VI_PATH%     , 
+WinWaitActive   , %VI_TITLE%    ,
 Sleep           , 500
 ;Run             , %RK_PATH%     , 
 ;WinWaitActive   , %RK_TITLE%    ,
