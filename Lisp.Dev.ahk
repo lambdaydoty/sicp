@@ -4,6 +4,8 @@ SetTitleMatchMode, 2
 ;RK_TITLE := "Untitled - DrRacket ahk_exe DrRacket.exe"
 LISP_PATH := "D:\Dropbox\02.Lambda\Lisp-Solutions\00-sicp"
 LISP_TITLE:= "00-sicp ahk_exe explorer.exe"
+PS_PATH  := "powershell /c ""start powershell -wo " . LISP_PATH . """"
+PS_TITLE := "PowerShell ahk_exe powershell.exe"
 Loop, %LISP_PATH%\*.*
 {
 	CheckFile_Start := A_LoopFileTimeCreated
@@ -15,6 +17,9 @@ Loop, %LISP_PATH%\*.*
 }
 VI_PATH  := "gvim -c ""simalt ~x"" -c ""cd " . LISP_PATH . """ -c ""e .\" . NewestFileName . """ -c ""vsp"""
 VI_TITLE := "ahk_exe gvim.exe"
+Run             , %PS_PATH%     ,
+WinWaitActive   , %PS_TITLE%    ,
+Sleep           , 4000
 Run             , %LISP_PATH%     , 
 WinWaitActive   , %LISP_TITLE%    ,
 Sleep           , 500

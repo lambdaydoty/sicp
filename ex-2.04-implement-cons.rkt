@@ -1,0 +1,19 @@
+#lang racket
+(require racket/trace)
+
+(define (cons x y)
+  (lambda (m) (m x y)))
+
+(define (car z)
+  (z (lambda (p q) p)))
+
+(define (cdr z)
+  (z (lambda (p q) q)))
+
+(trace cons)
+(trace car)
+(trace cdr)
+
+
+(car (cons 1 2))
+(cdr (cons 1 2))

@@ -19,17 +19,22 @@
   (if (= n 0)
     id
     (compose f (repeated f (- n 1)))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define (power t n) (if (= n 0) 1 (* t (power t (- n 1)))))
+(define (seed-func x n)
+  (lambda (y) (/ x (power y (- n 1)))))
 
-(define (seed x n)
-  (lambda (y)
-    (/ x
-       ((repeated (lambda (t) (* y t)) (- n 1)) 1))))
 
-
-(define (square-root x)  (fixed-point (average-damp
-                                        (seed x 2))         1.0))
-(define (cube-root x)    (fixed-point (average-damp
-                                        (average-damp
-                                          (seed x 3)))      1.0))
-(square-root  2)
-(cube-root    2)        (newline)
+(define x 2)
+(display "2^(1/2)^2: ") (power (fixed-point ((repeated average-damp 1 ) (seed-func x 2))  1.0) 2)
+(display "2^(1/3)^3: ") (power (fixed-point ((repeated average-damp 1 ) (seed-func x 3))  1.0) 3)
+(display "\n")
+(display "2^(1/4)^4: ") (power (fixed-point ((repeated average-damp 2 ) (seed-func x 4))  1.0) 4)
+(display "2^(1/5)^5: ") (power (fixed-point ((repeated average-damp 2 ) (seed-func x 5))  1.0) 5)
+(display "2^(1/6)^6: ") (power (fixed-point ((repeated average-damp 2 ) (seed-func x 6))  1.0) 6)
+(display "2^(1/7)^7: ") (power (fixed-point ((repeated average-damp 2 ) (seed-func x 7))  1.0) 7)
+(display "\n")
+(display "2^(1/8)^8: ") (power (fixed-point ((repeated average-damp 3 ) (seed-func x 8))  1.0) 8)
+(display "2^(1/9)^9: ") (power (fixed-point ((repeated average-damp 3 ) (seed-func x 9))  1.0) 9)
+(display "\n")
+(display "For nth roots, we need to repeat the average-damp in log(n) times!\n")
