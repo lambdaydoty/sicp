@@ -1,20 +1,30 @@
 #lang racket
 (require racket/trace)
 
-(define (reverse0 l)
-  (cond ((null? l) '())
-        (else (append (reverse0 (cdr l))
-                      (list (car l))))))
-(trace reverse0)
-(reverse0 '(23 72 149 34))
-(display "\n")
+(define (reverse-append lat)
+  (cond ((null? lat) '())
+        (else (append (reverse-append (cdr lat))
+                      (list (car lat))))))
+(trace reverse-append)
 
 
-(define (reverse1 l)
+(define (reverse-iter l)
   (define (iter left right)
     (if (null? left)
       right
       (iter (cdr left) (cons (car left) right))))
   (trace iter)
   (iter l '()))
-(reverse1 '(23 72 149 34))
+
+;; demo
+
+(define test0 '())
+(define test1 '(23 72 149 34))
+
+(define (demo reverse)
+  (reverse test0)
+  (reverse test1)
+  (display "\n"))
+
+(demo reverse-append)
+(demo reverse-iter)

@@ -1,0 +1,51 @@
+#lang racket
+(require "2.1.4-Extended-Exercise-Interval-Arithmetic.rkt")
+(require "ex-2.07-interval-selectors.rkt")
+(require "ex-2.08-sub-interval.rkt")
+
+
+;;;; ----------------------------------------------
+(define (width x) (/ (- (upper-bound x) 
+                        (lower-bound x))
+                     2))
+(define (shift x dx) (make-interval (+ dx (lower-bound x))
+                                    (+ dx (upper-bound x))))
+
+(define int1 (make-interval 1.1 2.1))
+(define int2 (make-interval 2.0 3.0))
+(width int1)
+(width int2)
+(display "+: ") (width (add-interval int1 int2))
+(display "-: ") (width (sub-interval int1 int2))
+(display "*: ") (width (mul-interval int1 int2))
+(display "/: ") (width (div-interval int1 int2))
+(display "\n")
+
+(define vec 0.33)
+(display "Shift the interval by ")
+(display vec)
+(display "\n")
+
+(define int3 (shift int1 vec))
+(define int4 (shift int2 vec))
+(width int3)
+(width int4)
+(display "+: ") (width (add-interval int3 int4))
+(display "-: ") (width (sub-interval int3 int4))
+(display "*: ") (width (mul-interval int3 int4))
+(display "/: ") (width (div-interval int3 int4))
+(display "\n")
+
+(display "Shift again the interval by ")
+(display vec)
+(display "\n")
+
+(define int5 (shift int3 vec))
+(define int6 (shift int4 vec))
+(width int5)
+(width int6)
+(display "+: ") (width (add-interval int5 int6))
+(display "-: ") (width (sub-interval int5 int6))
+(display "*: ") (width (mul-interval int5 int6))
+(display "/: ") (width (div-interval int5 int6))
+(display "\n")

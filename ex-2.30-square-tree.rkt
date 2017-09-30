@@ -1,33 +1,34 @@
 #lang racket
 (require racket/trace)
+(define nil '())
+(define (atom? x) (and (not (pair? x))
+                       (not (null? x))))
+;;      S-list := ()     | (S-exp . S-list)
+;;      S-exp  := Symbol | S-list
+(define (square x) (* x x))
 
 
-(define (square-tree1 tree)
+(define (square-tree-direct tree)
   (cond ((null? tree) '())
-        ((not (pair? tree)) (* tree tree))
-        (else (cons (square-tree1 (car tree))
-                    (square-tree1 (cdr tree))))))
+        ((atom? (car tree)) (cons (square               (car tree))
+                                  (square-tree-direct   (cdr tree))))
+        (else               (cons (square-tree-direct   (car tree))
+                                  (square-tree-direct   (cdr tree))))))
 
-(define (square-tree2 tree)
-  (map (lambda (sub-tree)
-         (if (pair? sub-tree) 
-           (square-tree2 sub-tree)
-           (* sub-tree sub-tree)))
-       tree))
+(define (square-tree-map tree)
+  (map (lambda (element)
+         (if (atom? element) 
+           (square          element)
+           (square-tree-map element))) tree))
 
-(define (square-tree3 tree)
-  (cond ((null? tree) '())
-        ((not (pair? tree)) (* tree tree))
-        (else (map (lambda (t) (square-tree3 t)) tree))))
-
+;; demo
+(define my-tree '(1 (2 (3 4) 5) (6 7)))
+(display my-tree)
+(display "\n")
 (define (demo square-tree)
-  (define x '(1 (2 (3 4) 5) (6 7)))
-  (display (square-tree x))
-  (display "\n"))
+  (square-tree my-tree))
 
-;(trace fringe1)
-(demo square-tree1)
-(demo square-tree2)
-(demo square-tree3)
+(demo square-tree-direct)
+(demo square-tree-map)
 
 

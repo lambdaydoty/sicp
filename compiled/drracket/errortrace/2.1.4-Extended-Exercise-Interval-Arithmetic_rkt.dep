@@ -1,0 +1,1 @@
+("6.1" ("739fd6dc4b34157021e93c61dc1761feafb16951" . "9433f729efcb3e2447d734423f29dcf718d9ce18") (collects #"errortrace" #"errortrace-key.rkt") (collects #"racket" #"main.rkt") (collects #"racket" #"runtime-config.rkt") #"D:\\Dropbox\\02.Lambda\\Lisp-Solutions\\00-sicp\\ex-2.07-interval-selectors.rkt")
