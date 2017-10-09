@@ -64,10 +64,6 @@
 (define (contents   datum)             (if (pair? datum)
                                          (cdr datum)
                                          (error "Bad tagged datum: CONTENTS" datum)))
-;; Define our tag type for the Complex Number System
-(define (rectangular? z) (eq? (type-tag z) 'rectangular))
-(define (polar?       z) (eq? (type-tag z) 'polar))
-
 
 ;; /* -------------------------------------------------------------- *\
 ;;  *                 THE ABSTRACT BARRIER                           *

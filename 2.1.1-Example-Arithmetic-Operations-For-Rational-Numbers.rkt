@@ -1,5 +1,12 @@
 #lang racket
-;(require "2.1.1-Constructors-and-Selectors.rkt")
+;(define (make-rat n d)  (let ((g (gcd n d))) (cons (/ n g) (/ d g))))
+;(define (numer z)       (car z))
+;(define (denom z)       (cdr z))
+;(define (print-rat z)
+;  (newline)
+;  (display (numer z))
+;  (display "/")
+;  (display (denom z)))
 (require "ex-2.01-better-make-rat.rkt")
 ; Suppose we want to do arithmetic with rational numbers:
 ;   1) add
