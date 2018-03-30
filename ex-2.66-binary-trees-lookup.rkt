@@ -1,85 +1,76 @@
 #lang racket
 (require racket/trace)
+(require compatibility/mlist)
+(define (deep ml) (mlist->list (mmap (lambda (x) (if (not (mpair? x))
+                                                   x
+                                                   (deep x))) ml)))
 
+;; Information Retrieval
+;; lookup using binary trees
 
-;; 2.3.3-Sets-as-binary-trees
-(define (entry tree) (car tree))
-(define (left-branch tree) (cadr tree))
-(define (right-branch tree) (caddr tree))
-(define (make-tree entry left right)
-  (list entry left right))
+(define empty-set '())
+(define nil '())
 
-;; ex-2.63
-(define (tree->list tree)
-  (define (copy-to-list tree result-list)
-    (if (null? tree)
-      result-list
-      (copy-to-list (left-branch tree)
-                    (cons (entry tree)
-                          (copy-to-list (right-branch tree) result-list)))))
-  (copy-to-list tree '()))
+;; a tree node = (entry left right)
+(define (entry        node)          (mcar node))              ; selectors
+(define (left-branch  node)          (mcar (mcdr node)))
+(define (right-branch node)          (mcar (mcdr (mcdr node))))
+(define (make-node entry left right) (mlist entry left right)) ; constructor
+(define (set-entry! node val)        (set-mcar! node val))     ; mutators
+(define (set-left!  node val)        (set-mcar! (mcdr node) val))
+(define (set-right! node val)        (set-mcar! (mcdr (mcdr node)) val))
 
-;; ex-2.64
-(define (list->tree elements)
-  (car (partial-tree elements (length elements))))
+;; a record = (key value)
+(define (key   record)          (car record))       ; selectors
+(define (value record)          (cdr record))
+(define (make-record key value) (cons key value))   ; constructor
 
-(define (partial-tree elts n)       ;; elts = list of at least n elements
-  (if (= n 0)
-    (cons '() elts)
-    (let ((left-size (quotient (- n 1) 2)))
-      (let ((left-result (partial-tree elts left-size)))
-        (let ((left-tree     (car left-result))
-              (non-left-elts (cdr left-result))
-              (right-size (- n (+ left-size 1))))
-          (let ((this-entry (car non-left-elts))
-                (right-result (partial-tree (cdr non-left-elts) right-size)))
-            (let ((right-tree     (car right-result))
-                  (remaining-elts (cdr right-result)))
-              (cons (make-tree this-entry 
-                               left-tree 
-                               right-tree)
-                    remaining-elts))))))))
+;; a table = a binary tree with tree node
+(define (make-table)
+  (let ([local-table (mlist '*empty* nil nil)])
+    (define (lookup given-key)
+      (define (assoc tree-nodes)
+        (cond ((null? tree-nodes) #f)
+              ((= given-key (key (entry tree-nodes)))  (entry tree-nodes))
+              ((< given-key (key (entry tree-nodes)))  (assoc (left-branch  tree-nodes)))
+              ((> given-key (key (entry tree-nodes)))  (assoc (right-branch tree-nodes)))))
+      (let ([record (assoc local-table)])
+        (if record (value record) #f)))
+    (define (insert! given-key given-val)
+      (define (adjoint-set! x set)
+        (cond ((eq? '*empty* (entry set))    (set-entry! set x))
+              ((= (key x) (key (entry set))) (set-entry! set x))
+              ((< (key x) (key (entry set))) (if (null? (left-branch set))
+                                               (set-left! set (make-node x nil nil))
+                                               (adjoint-set! x (left-branch set))))
+              ((> (key x) (key (entry set))) (if (null? (right-branch set))
+                                               (set-right! set (make-node x nil nil))
+                                               (adjoint-set! x (right-branch set))))))
+      (adjoint-set! (make-record given-key given-val) local-table))
+    (define (print)
+      (display (deep local-table))
+      (newline))
+    (define (dispatch m)
+      (cond ((eq? m 'lookup) lookup)
+            ((eq? m 'insert!) insert!)
+            ((eq? m 'print) print)
+            (else (error "Unknown operation -- TABLE" m))))
+    dispatch))
 
-;; ex-2.62
-(define (union-merge ol1 ol2)
-  (cond ((null? ol1) ol2)
-        ((null? ol2) ol1)
-        ((= (car ol1) (car ol2)) (cons (car ol1)
-                                       (union-merge (cdr ol1) (cdr ol2))))
-        ((< (car ol1) (car ol2)) (cons (car ol1)
-                                       (union-merge (cdr ol1) ol2)))
-        ((> (car ol1) (car ol2)) (cons (car ol2)
-                                       (union-merge ol1 (cdr ol2))))
-        (else (error "!!?"))))
+(define (insert! database key val) ((database 'insert!) key val))
+(define (lookup  database key)     ((database 'lookup)  key))
+(define (disp    database)         ((database 'print)))
 
-;; 2.3.3-Sets-as-ordered-lists
-(define (intersection-merge ol1 ol2)
-  (cond ((null? ol1) '())
-        ((null? ol2) '())
-        ((= (car ol1) (car ol2)) (cons (car ol1)
-                                       (intersection-merge (cdr ol1) (cdr ol2))))
-        ((< (car ol1) (car ol2)) (intersection-merge (cdr ol1) ol2))
-        ((> (car ol1) (car ol2)) (intersection-merge ol1 (cdr ol2)))
-        (else (error "!!?"))))
-
-;; ex-2.65
-(define (union-set set1 set2)
-  (list->tree
-    (union-merge (tree->list set1)
-                 (tree->list set2))))
-(define (intersection-set set1 set2)
-  (list->tree
-    (intersection-merge (tree->list set1)
-                        (tree->list set2))))
-
-;; demo
-
-(define tree-2-16-1 '(7 (3 (1 () ()) (5 () ())) (9 () (11 () ()))))
-(define tree-2-16-2 '(3 (1 () ()) (7 (5 () ()) (9 () (11 () ())))))
-(define tree-2-16-3 '(5 (3 (1 () ()) ()) (9 (7 () ()) (11 () ()))))
-
-(union-set        tree-2-16-1 tree-2-16-2)
-(union-set        tree-2-16-3 '(0 () (15 (13 () ()) (17 () ()))))
-(newline)
-(intersection-set tree-2-16-1 tree-2-16-2)
-(intersection-set tree-2-16-3 '(5 (0 () ()) (7 () ())))
+(define DB (make-table))
+(insert! DB 0 'zero)
+(insert! DB 3 'iii)
+(insert! DB 1 'i)
+(insert! DB 4 'iv)
+(insert! DB 1 'I)
+(insert! DB 5 'v)
+(insert! DB 9 'ix)
+(insert! DB 2 'ii)
+(insert! DB 6 'vi)
+(lookup DB 5)
+(lookup DB 7)
+(disp DB)

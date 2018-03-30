@@ -1,6 +1,10 @@
 #lang racket
 (require racket/trace)
 
+;; Information Retrieval
+;; lookup using unordered list
+
+(define empty-set '())
 (define (equal? l1 l2)
   (cond ((and (null? l1) (null? l2)) #t)                      ; nil + nil
         ((or  (null? l1) (null? l2)) #f)                      ; nil + not nil
@@ -17,21 +21,21 @@
   (if (element-of-set? x set)
     set
     (cons x set)))
-(define (intersection-set set1 set2)
-  (cond ((and (null? set1) (null? set2)) '())
-        ((or  (null? set1) (null? set2)) '())
-        (else (if (element-of-set? (car set1) set2) 
-          (cons (car set1) (intersection-set (cdr set1) set2))
-          (intersection-set (cdr set1) set2)))))
 
-(define A (adjoint-set 'x '(p q r s)))
-A
-(element-of-set? 'x A)
-(element-of-set? 'x '(p q r x s))
-(element-of-set? 'x '(p q r s))
-(element-of-set? 'x '())
-;(adjoint-set 'x '())
-;(adjoint-set 'x (adjoint-set 'x '()))
-;(adjoint-set 'y (adjoint-set 'x (adjoint-set 'x '())))
-;(intersection-set '(x y z) '(p q x a b z))
-;(intersection-set '(x y z) '(p q a b c))
+(define (lookup given-key set-of-records)
+  (cond ((null? set-of-records) #f)
+        ((equal? given-key
+                 (key (car set-of-records))) (car set-of-records))
+        (else (lookup given-key (cdr set-of-records)))))
+
+(define (key a-record) (car a-record)) ; a record is implemented as a pair of (key . value)
+
+(define DB (adjoint-set '(6 . value-6)
+                       (adjoint-set '(8 . value-8)
+                                    (adjoint-set '(1 . value-1)
+                                                 (adjoint-set '(7 . value-7) empty-set)))))
+DB
+(newline)
+(lookup 8 DB)
+(lookup 0 DB)
+

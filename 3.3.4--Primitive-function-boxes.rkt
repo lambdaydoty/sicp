@@ -1,0 +1,56 @@
+#lang racket
+(require "3.3.4--Representing-wires.rkt")
+(require "3.3.4--The-agenda.rkt")
+(provide inverter)
+(provide and-gate)
+;(provide or-gate)
+
+(define inverter-delay 2)
+(define and-gate-delay 3)
+;(define or-gate-delay 5)
+
+(define (inverter input output)
+  (define (logical-not s)
+    (cond ([= s 0] 1)
+          ([= s 1] 0)
+          (else (error "Invalid signal" s))))
+  (define (invert-input)
+    (let ([new-value (logical-not (get-signal input))])
+      (after-delay inverter-delay
+                   (lambda () (set-signal! output new-value)))))
+  (add-action! input invert-input)
+  'ok)
+
+(define (and-gate a1 a2 output)
+  (define (logical-and s t)
+    (cond ((and [= s 0] [= t 0]) 0)
+          ((and [= s 0] [= t 1]) 0)
+          ((and [= s 1] [= t 0]) 0)
+          ((and [= s 1] [= t 1]) 1)
+          (else (error "Invalid signal" s t))))
+  (define (and-action-procedure)
+    (let ([new-value
+            (logical-and (get-signal a1)
+                         (get-signal a2))])
+      (after-delay and-gate-delay
+                   (lambda () (set-signal! output new-value)))))
+  (add-action! a1 and-action-procedure)
+  (add-action! a2 and-action-procedure)
+  'ok)
+
+;(define (or-gate a1 a2 output)
+;  (define (logical-or s t)
+;    (cond ((and [= s 0] [= t 0]) 0)
+;          ((and [= s 0] [= t 1]) 1)
+;          ((and [= s 1] [= t 0]) 1)
+;          ((and [= s 1] [= t 1]) 1)
+;          (else (error "Invalid signal" s t))))
+;  (define (or-action-procedure)
+;    (let ([new-value
+;            (logical-or (get-signal a1)
+;                        (get-signal a2))])
+;      (after-delay or-gate-delay
+;                   (lambda () (set-signal! output new-value)))))
+;  (add-action! a1 or-action-procedure)
+;  (add-action! a2 or-action-procedure)
+;  'ok)

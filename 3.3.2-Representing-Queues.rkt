@@ -1,5 +1,11 @@
 #lang racket
 (require compatibility/mlist)
+(provide make-queue)
+(provide insert-queue!)
+(provide delete-queue!)
+(provide empty-queue?)
+(provide front-queue)
+(provide print-queue)
 
 (define (front-ptr queue) (mcar queue))
 (define (rear-ptr  queue) (mcdr queue))
@@ -33,13 +39,16 @@
   (mlist->list
     (mmap (lambda (x)
             (if (not (mpair? x))
-              x
+              (if (procedure? x) '<proc> x)
               (deep x))) ml)))
-
+;; ex-3.21
+(define (print-queue queue)
+  (display (deep (front-ptr queue)))
+  (newline))
 ;; -- demo --
-(define q1 (make-queue))
-(deep (insert-queue! q1 'a))
-(deep (insert-queue! q1 'b))
-(deep (delete-queue! q1))
-(deep (delete-queue! q1))
+;(define q1 (make-queue))
+;(deep (insert-queue! q1 'a))
+;(deep (insert-queue! q1 'b))
+;(deep (delete-queue! q1))
+;(deep (delete-queue! q1))
 

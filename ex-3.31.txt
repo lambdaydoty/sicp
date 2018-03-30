@@ -1,0 +1,8 @@
+(add-action! input invert-input)
+=> (accept-action-procedure! invert-input)
+=> (set! action-procedures (cons invert-input action-procedures))
+   (invert-input) *
+=> (after-delay inverter-delay (L () (set-signal! output new-value)))
+=> (add-to-agenda! (+ inverter-delay (current-time the-agenda))
+                   (L () (set-signal! output new-value)) **
+                   the-agenda))
